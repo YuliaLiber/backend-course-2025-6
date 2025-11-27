@@ -1,0 +1,419 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Inventory Service API",
+    "version": "1.0.0",
+    "description": "Сервіс інвентаризації для лабораторної роботи №6"
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:3000",
+      "description": "Локальний сервер"
+    }
+  ],
+  "paths": {
+    "/register": {
+      "post": {
+        "summary": "Додати новий предмет",
+        "description": "Реєстрація нового предмета інвентаря з опціональним фото.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "inventory_name": {
+                    "type": "string",
+                    "description": "Назва предмета"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Опис предмета"
+                  },
+                  "photo": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Файл фото"
+                  }
+                },
+                "required": [
+                  "inventory_name"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Предмет успішно створено",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryItem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некоректні дані запиту"
+          },
+          "405": {
+            "description": "Метод заборонено"
+          }
+        }
+      }
+    },
+    "/inventory": {
+      "get": {
+        "summary": "Отримати список усіх предметів",
+        "responses": {
+          "200": {
+            "description": "Список предметів",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InventoryItem"
+                  }
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Метод заборонено"
+          }
+        }
+      }
+    },
+    "/inventory/{id}": {
+      "get": {
+        "summary": "Отримати інформацію про конкретний предмет",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID предмета"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Знайдений предмет",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryItem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Предмет не знайдено"
+          },
+          "405": {
+            "description": "Метод заборонено"
+          }
+        }
+      },
+      "put": {
+        "summary": "Оновити назву та/або опис предмета",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID предмета"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InventoryUpdate"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/InventoryUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Оновлений предмет",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryItem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Предмет не знайдено"
+          },
+          "405": {
+            "description": "Метод заборонено"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Видалити предмет",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID предмета"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Предмет видалено"
+          },
+          "404": {
+            "description": "Предмет не знайдено"
+          },
+          "405": {
+            "description": "Метод заборонено"
+          }
+        }
+      }
+    },
+    "/inventory/{id}/photo": {
+      "get": {
+        "summary": "Отримати фото предмета",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID предмета"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Фото повертається як image/jpeg",
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Фото або предмет не знайдено"
+          },
+          "405": {
+            "description": "Метод заборонено"
+          }
+        }
+      },
+      "put": {
+        "summary": "Оновити фото предмета",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID предмета"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "photo": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Нове фото"
+                  }
+                },
+                "required": [
+                  "photo"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Фото оновлено, повертається оновлений предмет",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryItem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Предмет не знайдено"
+          },
+          "405": {
+            "description": "Метод заборонено"
+          }
+        }
+      }
+    },
+    "/search": {
+      "post": {
+        "summary": "Пошук предмета за ID",
+        "description": "Пошук предмета за ID. Якщо прапорець has_photo встановлено, до опису додається посилання на фото.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "description": "ID предмета"
+                  },
+                  "has_photo": {
+                    "type": "string",
+                    "description": "Якщо будь-яке значення, то додати посилання на фото"
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Знайдений предмет з описом (можливо з посиланням на фото)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Предмет не знайдено або ID некоректний"
+          },
+          "405": {
+            "description": "Метод заборонено"
+          }
+        }
+      }
+    },
+    "/RegisterForm.html": {
+      "get": {
+        "summary": "HTML-форма реєстрації предмета",
+        "responses": {
+          "200": {
+            "description": "Повертається HTML-форма",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Метод заборонено"
+          }
+        }
+      }
+    },
+    "/SearchForm.html": {
+      "get": {
+        "summary": "HTML-форма пошуку предмета",
+        "responses": {
+          "200": {
+            "description": "Повертається HTML-форма",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Метод заборонено"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "InventoryItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "photo": {
+            "type": "string",
+            "nullable": true,
+            "description": "URL для отримання фото"
+          }
+        }
+      },
+      "InventoryUpdate": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "SearchResult": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
